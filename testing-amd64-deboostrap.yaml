@@ -1,0 +1,36 @@
+{{- $debootstrap := or .debootstrap "testing-amd64.tar.gz" -}}
+{{- $hostname := or .hostname "testing" -}}
+
+architecture: amd64
+
+actions:
+  - action: debootstrap
+    suite: testing
+    components:
+      - main
+      - non-free-firmware
+    mirror: https://deb.debian.org/debian
+    variant: minbase
+
+  - action: apt
+    packages: [ sudo, openssh-server, adduser, systemd-boot, systemd-sysv, systemd, systemd-resolved, systemd-timesyncd, iputils-ping, golang, python3]
+
+  - action: run
+    chroot: true
+    script: setup-user.sh
+
+  - action: run
+    chroot: true
+    command: echo {{ $hostname }} > /etc/hostname
+
+  - action: overlay
+    source: networkd
+
+  - action: run
+    chroot: true
+    script: setup-networking.sh
+
+  - action: "pack"
+    compression: gz
+    file: {{ $debootstrap }}
+

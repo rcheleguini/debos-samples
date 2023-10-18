@@ -1,0 +1,77 @@
+{{- $debootstrap := or .debootstrap "testing-amd64.tar.gz" -}}
+{{- $image := or .image "testing-amd64.img" -}}
+
+architecture: amd64
+
+actions:
+  - action: unpack
+    file: {{ $debootstrap }}
+    compression: gz
+
+  - action: apt
+    recommends: false
+    packages:
+      - linux-image-generic
+
+  - action: run
+    chroot: true
+    command: echo console=ttyS0,115200 > /etc/kernel/cmdline
+
+  - action: image-partition
+    imagename: {{ $image }}
+    imagesize: 4G
+    partitiontype: gpt
+    mountpoints:
+      - mountpoint: /
+        partition: root
+      - mountpoint: /boot/efi
+        partition: EFI
+        options: [ x-systemd.automount ]
+    partitions:
+      - name: EFI
+        fs: fat32
+        start: 6176s
+        end: 256M
+        flags: [ boot ]
+      - name: root
+        fs: ext4
+        start: 256M
+        end:  100%
+
+  - action: filesystem-deploy
+    description: Deploying filesystem onto image
+
+  - action: run
+    chroot: true
+    command: bootctl install
+    description: running bootctl
+
+  - action: run
+    chroot: true
+    script: kernel-install.sh
+    description: running kernel-install.sh
+
+  # - action: run
+  #   chroot: true
+  #   command: kernel-install add 6.4.0-3-amd64 /boot/vmlinuz-6.4.0-3-amd64
+
+  - action: run
+    postprocess: true
+    command: bmaptool create {{ $image }} > {{ $image }}.img.bmap
+    description: running bmaptool
+
+  # for VirtualBox
+  # - action: run
+  #   postprocess: true
+  #   command: qemu-img convert -O vdi {{ $image }} {{ $image }}.vdi
+  #   description: running qemu-img convert to vdi
+
+  - action: "pack"
+    compression: gz
+    file: {{ $image }}
+    description: compressing image
+
+  # - action: run
+  #   postprocess: true
+  #   command: gzip -f {{ $image }}
+
