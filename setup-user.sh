@@ -1,8 +1,8 @@
 #!/bin/sh
 
-adduser --gecos debian \
+adduser --gecos user \
   --disabled-password \
   --shell /bin/bash \
-  debian
-adduser debian sudo
-echo "debian:debian" | chpasswd
+  user
+adduser user sudo
+echo "user:user" | chpasswd

@@ -2,3 +2,4 @@
 *.bmap
 *.vdi
 *.tar.gz
+ssh/*

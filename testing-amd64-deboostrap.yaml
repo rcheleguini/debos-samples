@@ -13,7 +13,7 @@ actions:
     variant: minbase
 
   - action: apt
-    packages: [ sudo, openssh-server, adduser, systemd-boot, systemd-sysv, systemd, systemd-resolved, systemd-timesyncd, iputils-ping, golang, python3]
+    packages: [ sudo, openssh-server, adduser, systemd-boot, systemd-sysv, systemd, systemd-resolved, systemd-timesyncd, iputils-ping, golang, python3, iproute2 ]
 
   - action: run
     chroot: true
@@ -25,6 +25,13 @@ actions:
 
   - action: overlay
     source: networkd
+
+  - action: overlay
+    source: ssh
+
+  - action: run
+    chroot: true
+    command: chown -R user:user /home/user/.ssh/
 
   - action: run
     chroot: true

@@ -19,7 +19,7 @@ actions:
 
   - action: image-partition
     imagename: {{ $image }}
-    imagesize: 4G
+    imagesize: 8G
     partitiontype: gpt
     mountpoints:
       - mountpoint: /
@@ -66,10 +66,10 @@ actions:
   #   command: qemu-img convert -O vdi {{ $image }} {{ $image }}.vdi
   #   description: running qemu-img convert to vdi
 
-  - action: "pack"
-    compression: gz
-    file: {{ $image }}
-    description: compressing image
+  # - action: "pack"
+  #   compression: gz
+  #   file: {{ $image }}
+  #   description: compressing image
 
   # - action: run
   #   postprocess: true
